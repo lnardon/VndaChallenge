@@ -1,18 +1,17 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const cors = require('cors')
 const fetch = require('node-fetch')
+require('dotenv').config()
 const app = express()
 const port = 8888
 
-app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/getUsers', async (req, res) => {
   let response = await fetch('https://demo.vnda.com.br/api/v2/users', {
     method: 'GET',
     headers: {
-      Authorization: 'Token token=agz7FqcWD2PU6NBsoqH2JTuS'
+      Authorization: `Token token=${process.env.apiKey}`
     }
   })
   let parsedResponse = await response.json()
@@ -23,7 +22,7 @@ app.post('/registerUser', async (req, res) => {
   let response = await fetch('https://demo.vnda.com.br/api/v2/users', {
     method: 'POST',
     headers: {
-      Authorization: 'Token token=agz7FqcWD2PU6NBsoqH2JTuS'
+      Authorization: `Token token=${process.env.apiKey}`
     },
     body: req.body
   })
@@ -37,12 +36,11 @@ app.post('/updateUser', async (req, res) => {
     {
       method: 'PATCH',
       headers: {
-        Authorization: 'Token token=agz7FqcWD2PU6NBsoqH2JTuS'
+        Authorization: `Token token=${process.env.apiKey}`
       },
       body: req.body
     }
   )
-  console.log(req.body)
   res.json(response)
 })
 

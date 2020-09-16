@@ -31,12 +31,6 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function createData(name: string, email: string, externalCode: string) {
-  return { name, email, externalCode }
-}
-
-const rows = [createData('John Jonson', 'john@capital.co.uk', '0045')]
-
 const RegistrationComponent: React.FC = () => {
   const classes = useStyles()
   const [name, setName] = useState('')
@@ -49,22 +43,29 @@ const RegistrationComponent: React.FC = () => {
     setPosition(parseInt(event.target.value))
   }
 
-  const sendData = () => {
+  const sendData = async () => {
     let tagsArray = tags.split(',')
-    fetch('https://demo.vnda.com.br/api/v2/users', {
+    let response = await fetch('http://localhost:8888/registerUser', {
       method: 'POST',
-      headers: {
-        Authorization: `Token token=${process.env.REACT_APP_API_TOKEN}`
-      },
       body: JSON.stringify({
-        name,
-        email,
+        name: name,
+        email: email,
         external_code: externalCode,
         role: position,
-        tags: tagsArray
+        tags: tagsArray,
+        admin: false,
+        renew_password: true,
+        access_token: null,
+        phone_area: null,
+        phone: null
       })
     })
-    alert('Cadastro realizado com sucesso!')
+    console.log(response)
+    if (response.status === 200) {
+      alert('Usuario Cadastrado')
+    } else {
+      alert('Erro ao cadastrar usuario')
+    }
   }
 
   return (

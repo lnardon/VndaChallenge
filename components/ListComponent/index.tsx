@@ -74,70 +74,9 @@ interface IUser {
 
 const ListComponent: React.FC = () => {
   const classes = useStyles()
-  const [users, setUsers] = useState<IUser[]>([
-    {
-      id: 294,
-      email: 'alex@albon',
-      name: 'Alex Albon',
-      admin: false,
-      renew_password: true,
-      role: 2,
-      access_token: null,
-      tags: ['Vendas', 'Compras', 'Tags'],
-      external_code: 'TE',
-      phone_area: null,
-      phone: null,
-      created_at: '2020-09-13T23:25:01.494-03:00',
-      updated_at: '2020-09-14T00:01:22.786-03:00'
-    },
-    {
-      id: 269,
-      email: 'pedro@vnda.com.br',
-      name: 'Pedro',
-      admin: false,
-      renew_password: true,
-      role: 0,
-      access_token: null,
-      tags: ['Compras', 'Vendas'],
-      external_code: 'GRA',
-      phone_area: null,
-      phone: null,
-      created_at: '2020-09-09T01:23:17.087-03:00',
-      updated_at: '2020-09-09T01:23:17.096-03:00'
-    },
-    {
-      id: 206,
-      email: 'joice@vnda.com',
-      name: 'Joice',
-      admin: false,
-      renew_password: false,
-      role: 0,
-      access_token: null,
-      tags: ['ceo'],
-      external_code: 'POA',
-      phone_area: null,
-      phone: null,
-      created_at: '2019-07-31T16:37:23.253-03:00',
-      updated_at: '2019-07-31T16:37:23.253-03:00'
-    },
-    {
-      id: 205,
-      email: 'Bobert@vnda.com',
-      name: 'Boberto',
-      admin: false,
-      renew_password: false,
-      role: 0,
-      access_token: null,
-      tags: ['ceo'],
-      external_code: 'POA',
-      phone_area: null,
-      phone: null,
-      created_at: '2019-07-31T16:36:55.937-03:00',
-      updated_at: '2019-07-31T16:36:55.937-03:00'
-    }
-  ])
+  const [users, setUsers] = useState<IUser[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalUserData, setModalUserData] = useState<IUser>()
+  const [modalUserData, setModalUserData] = useState<IUser>(null)
   const [modalName, setModalName] = useState('')
   const [modalEmail, setModalEmail] = useState('')
   const [modalRole, setModalRole] = useState(0)
@@ -197,40 +136,34 @@ const ListComponent: React.FC = () => {
     </div>
   )
 
-  // Gets the data from API, because of CORS problems this is not working
   useEffect(() => {
     ;(async () => {
-      let response = await fetch('https://demo.vnda.com.br/api/v2/users', {
-        method: 'GET',
-        headers: {
-          Authorization: `Token token=${process.env.REACT_APP_API_TOKEN}`
-        }
-      })
+      let response = await fetch('http://localhost:8888/getUsers')
       let parsedResponse = await response.json()
       setUsers(parsedResponse)
     })()
   }, [])
 
   async function updateUser() {
-    // Para realizar o fetch(PUT) o cors acusa o mesmo problema com o servidor
     let tags = modalTags.split(',')
-    let response = await fetch(
-      `https://demo.vnda.com.br/api/v2/users/${modalUserData.id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Token token=${process.env.REACT_APP_API_TOKEN}`
-        },
-        body: JSON.stringify({
-          email: modalEmail,
-          name: modalName,
-          role: modalRole,
-          tags: tags,
-          external_code: modalExternalCode
-        })
-      }
-    )
-    alert('Usuario Atualizado')
+    let response = await fetch('http://localhost:8888/updateUser', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: modalUserData.id,
+        name: modalName,
+        email: modalEmail,
+        external_code: modalExternalCode,
+        role: modalRole
+      })
+    })
+    if (response.status === 200) {
+      alert('Usuario Atualizado')
+    } else {
+      alert('Erro ao atualizar usuario')
+    }
     setIsModalOpen(!isModalOpen)
   }
 
